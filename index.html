@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Attribution">
+<meta name="theme-color" content="#0a0c12">
+<title>Attribution</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#0a0c12;--s:#11141d;--s2:#171b27;--b:#232838;--t:#f2f4fa;--t2:#9aa2b8;--t3:#626a80;--a:#8b7bff;--g:#34d399;--r:#ff6b78;--y:#f5b041;--m:#1877f2;--k:#e5256b;--gg:#f5a524}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--t);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 12px) 18px 12px;background:rgba(10,12,18,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--b)}
+header h1{font-size:19px;margin:0;letter-spacing:-.4px;font-weight:800}
+.ib{background:var(--a);color:#fff;border:0;border-radius:20px;padding:8px 14px;font:600 13px -apple-system,system-ui;cursor:pointer}
+main{position:fixed;top:0;bottom:0;left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 66px) 16px calc(env(safe-area-inset-bottom) + 92px)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;background:rgba(17,20,29,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--b);padding:8px 8px calc(env(safe-area-inset-bottom) + 8px)}
+nav button{flex:1;background:none;border:0;color:var(--t3);font:600 11px -apple-system,system-ui;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+nav button svg{width:22px;height:22px}
+nav button.on{color:var(--a)}
+.card{background:var(--s);border:1px solid var(--b);border-radius:18px;padding:16px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px}
+.kpi small{display:block;color:var(--t3);font-size:12px;font-weight:600}
+.kpi b{display:block;font:700 22px "SF Mono",ui-monospace,Menlo,monospace;margin-top:4px;letter-spacing:-.5px}
+.kpi span{font-size:11px;color:var(--t3)}
+h2{font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--t3);margin:20px 4px 10px;font-weight:700}
+.row{display:flex;align-items:center;gap:12px}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--a),#e25bd0);flex-shrink:0}
+.grow{flex:1;min-width:0}
+.name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:12px;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.big{font:800 26px "SF Mono",ui-monospace,monospace;letter-spacing:-.8px;text-align:right}
+.big small{display:block;font:500 11px -apple-system,system-ui;color:var(--t3);letter-spacing:0}
+.chip{display:inline-block;font:700 10.5px -apple-system,system-ui;padding:3px 9px;border-radius:20px;color:#fff;margin-left:6px;vertical-align:middle}
+.cM{background:var(--m)}.cT{background:var(--k)}.cG{background:var(--gg)}.cS{background:#FFFC00;color:#222}
+.vg{background:var(--g);color:#06241a}.vy{background:var(--y);color:#2b1d00}.vr{background:var(--r);color:#2d0a0f}
+.bar{height:7px;border-radius:6px;background:var(--s2);display:flex;overflow:hidden;margin:12px 0 6px}
+.bar i{display:block;height:100%}
+.split{display:flex;justify-content:space-between;font-size:12px;color:var(--t2)}
+.split b{font-family:"SF Mono",ui-monospace,monospace;color:var(--t)}
+.seg{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex-shrink:0;background:var(--s);border:1px solid var(--b);color:var(--t2);border-radius:20px;padding:7px 14px;font:600 13px -apple-system,system-ui;cursor:pointer}
+.seg button.on{background:var(--a);border-color:var(--a);color:#fff}
+label{display:block;font-size:12px;color:var(--t3);font-weight:600;margin:0 0 6px}
+input.in{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:12px;color:var(--t);padding:12px 12px;font:600 17px "SF Mono",ui-monospace,monospace;-webkit-appearance:none}
+input.in:focus{outline:0;border-color:var(--a)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;background:var(--a);color:#fff;border:0;border-radius:14px;padding:14px;font:700 15px -apple-system,system-ui;margin-top:12px;cursor:pointer}
+.btn.ghost{background:var(--s2);color:var(--t2);border:1px solid var(--b)}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.res div{background:var(--s2);border-radius:12px;padding:10px 12px}
+.res small{display:block;font-size:11px;color:var(--t3);font-weight:600}
+.res b{font:700 17px "SF Mono",ui-monospace,monospace}
+.be{color:var(--g)}.bn{color:var(--r)}
+.empty{text-align:center;color:var(--t3);padding:50px 20px}
+.empty b{display:block;color:var(--t);font-size:17px;margin-bottom:6px}
+.unm{border-color:rgba(255,107,120,.35);background:rgba(255,107,120,.06)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 100px);background:var(--s2);border:1px solid var(--b);padding:10px 16px;border-radius:14px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><h1 id="ttl">Attribution</h1><button class="ib" id="imp">Import</button></header>
+<main id="main"></main>
+<nav id="nav">
+ <button data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+ <button data-v="camp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Campaigns</button>
+ <button data-v="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>Offers</button>
+ <button data-v="spend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Spend</button>
+</nav>
+<input type="file" id="fin" multiple accept=".xlsx,.xls,.csv" hidden>
+<div id="toast"></div>
+
+<script>
+var PL=['Meta','TikTok','Google','Snapchat'],PC={Meta:'var(--m)',TikTok:'var(--k)',Google:'var(--gg)',Snapchat:'#FFFC00'};
+var OF=[{k:'box5',n:'بوكس التوفير 5 قطع',sell:999,cost:546,rr:.3,conf:.675,ship:85,pack:12,rship:75},{k:'9pm',n:'9pm night out',sell:999,cost:335,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'arojet',n:'أروجيت بينك 200 مل',sell:999,cost:387,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'glitch',n:'جليتش 150 مل',sell:999,cost:387,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'wild',n:'وايلد كولت 200 مل',sell:799,cost:330,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'lip',n:'ليب ستيك 150 مل',sell:999,cost:387,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'boxarojet',n:'بوكس أروجيت بينك',sell:1499,cost:835,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'abhar',n:'عرض الابهار',sell:999,cost:560,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'elite',n:'عرض النخبة',sell:999,cost:560,rr:.2,conf:.675,ship:85,pack:12,rship:75},{k:'female',n:'عرض الانوثة',sell:999,cost:560,rr:.2,conf:.675,ship:85,pack:12,rship:75}];
+
+var S={camp:[],orders:null,spend:[],list:[],unm:{},nocamp:0,tot:0,dates:[],bs:{},off:{}};
+var cur='home',filt='All',sb='';
+try{S.bs=JSON.parse(localStorage.getItem('mb_bs')||'{}')}catch(e){}
+try{S.off=JSON.parse(localStorage.getItem('mb_off')||'{}')}catch(e){}
+var OFS=OF.map(function(o){return Object.assign({},o,S.off[o.k]||{})});
+
+function $(i){return document.getElementById(i)}
+function N(s){return String(s==null?'':s).replace(/\s+/g,' ').trim()}
+function K(s){return N(s).toLowerCase()}
+function f(n,d){return n==null||n===''||isNaN(n)?'—':Number(n).toLocaleString('en-US',{maximumFractionDigits:d==null?0:d})}
+function esc(s){return N(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function fk(row,names){var ks=Object.keys(row||{});for(var i=0;i<names.length;i++)for(var j=0;j<ks.length;j++)if(K(ks[j])===names[i])return ks[j];for(i=0;i<names.length;i++)for(j=0;j<ks.length;j++)if(K(ks[j]).indexOf(names[i])===0)return ks[j];return null}
+function p2(n){return('0'+n).slice(-2)}
+function day(v){if(v instanceof Date)return v.getFullYear()+'-'+p2(v.getMonth()+1)+'-'+p2(v.getDate());var s=String(v||'');return /^\d{4}-\d\d-\d\d/.test(s)?s.slice(0,10):''}
+function plat(v){return /tik/i.test(v)?'TikTok':/snap/i.test(v)?'Snapchat':/goo|gads|youtube|search|pmax/i.test(v)?'Google':'Meta'}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on')},1800)}
+function read(file,cb){var r=new FileReader();r.onload=function(e){try{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});cb(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:true}))}catch(x){toast('Could not read '+file.name);cb([])}};r.readAsArrayBuffer(file)}
+
+function okey(n){n=N(n);if(/بوكس.*(اروجيت|أروجيت)|(اروجيت|أروجيت).*بوكس/.test(n))return 'boxarojet';if(/توفير|خمس/.test(n))return 'box5';if(/9 ?pm|night/i.test(n))return '9pm';if(/اروجيت|أروجيت/.test(n))return 'arojet';if(/جليتش|glitch/i.test(n))return 'glitch';if(/كولت|wild/i.test(n))return 'wild';if(/ليب/.test(n))return 'lip';if(/الابهار/.test(n))return 'abhar';if(/النخبة/.test(n))return 'elite';if(/الانوثة/.test(n))return 'female';return null}
+function ofc(o){var del=o.sell-o.cost-o.ship-o.pack,loss=o.pack+o.rship,be=(1-o.rr)*del-o.rr*loss;return {del:del,loss:loss,be:be,raw:be*o.conf}}
+function offerFor(c){return OFS.filter(function(x){return x.k===okey(c.offer)})[0]||null}
+function verdict(c,cp){var o=offerFor(c);if(!o||cp==null)return null;var be=ofc(o).raw;if(be<=0)return {t:'Kill',c:'vr'};if(cp<=be*.7)return {t:'Scale',c:'vg'};if(cp<=be)return {t:'Keep',c:'vy'};return {t:'Kill',c:'vr'}}
+
+function classify(rows){if(!rows.length)return;var h=Object.keys(rows[0]).map(K);
+ if(h.indexOf('utm campaign')>=0)S.orders=rows;
+ else if(h.indexOf('campaign id')>=0&&h.some(function(x){return x.indexOf('media')>=0||x.indexOf('offer')>=0}))S.camp=rows;
+ else S.spend=S.spend.concat(rows)}
+
+function build(){
+ var c0=S.camp[0]||{},ki=fk(c0,['campaign id']),kn=fk(c0,['campaign name']),ko=fk(c0,['offer name','offer']),kb=fk(c0,['media buyer','media']),kp=fk(c0,['platform']);
+ S.list=[];var byKey={},byName={};
+ S.camp.forEach(function(r){var k=K(r[ki]);if(!k||byKey[k])return;var c={id:N(r[ki]),name:N(r[kn]||r[ki]),offer:N(r[ko]),buyer:N(r[kb])||'Unassigned',plat:plat(N(r[kp])),orders:0,on:0,sd:{},days:{}};byKey[k]=c;byName[K(c.name)]=c;S.list.push(c)});
+ S.unm={};S.nocamp=0;S.tot=0;var dates={};
+ if(S.orders){var o0=S.orders[0],ku=fk(o0,['utm campaign']),kpn=fk(o0,['product name']),kc=fk(o0,['createdat','created']);
+  S.orders.forEach(function(r){S.tot++;var u=K(r[ku]);if(!u){S.nocamp++;return}var c=byKey[u];if(!c){var q=S.unm[u]||(S.unm[u]={n:0,raw:N(r[ku])});q.n++;return}c.orders++;if(K(r[kpn])===K(c.offer))c.on++;var d=kc?day(r[kc]):'';if(d){c.days[d]=(c.days[d]||0)+1;dates[d]=1}})}
+ if(S.spend.length){var s0=S.spend[0],ksd=fk(s0,['date','day','reporting starts']),ksi=fk(s0,['campaign id','campaign_id']),ksn=fk(s0,['campaign name','campaign_name','campaign']),kss=fk(s0,['amount spent','spend','cost','total cost']);
+  S.spend.forEach(function(r){var c=byKey[K(r[ksi])]||byName[K(r[ksn])];var a=parseFloat(String(r[kss]).replace(/[^\d.\-]/g,''));if(!c||isNaN(a))return;var d=ksd?day(r[ksd]):'_';c.sd[d]=(c.sd[d]||0)+a;if(d!=='_')dates[d]=1})}
+ S.dates=Object.keys(dates).sort()}
+
+function cspend(c){var t=0;for(var d in c.sd)t+=c.sd[d];return t}
+function buyers(){var m={};
+ S.list.forEach(function(c){var a=m[c.buyer]||(m[c.buyer]={name:c.buyer,orders:0,ps:{Meta:0,TikTok:0,Google:0,Snapchat:0},po:{Meta:0,TikTok:0,Google:0,Snapchat:0},camps:0});a.orders+=c.orders;a.po[c.plat]+=c.orders;a.ps[c.plat]+=cspend(c);if(c.orders)a.camps++});
+ Object.keys(m).forEach(function(b){var a=m[b],ov=S.bs[b]||{};PL.forEach(function(p){if(ov[p]!==undefined&&ov[p]!=='')a.ps[p]=+ov[p]||0});a.spend=PL.reduce(function(s,p){return s+a.ps[p]},0);a.cpa=a.orders&&a.spend?a.spend/a.orders:null});
+ return Object.keys(m).map(function(k){return m[k]}).sort(function(x,y){return y.orders-x.orders})}
+function totals(B){var t={Meta:0,TikTok:0,Google:0,Snapchat:0},sp=0,att=0;B.forEach(function(b){PL.forEach(function(p){t[p]+=b.ps[p]});att+=b.orders});PL.forEach(function(p){sp+=t[p]});return {t:t,spend:sp,att:att}}
+
+function empty(){return '<div class="empty"><b>No data yet</b>Tap <b style="display:inline;color:var(--a)">Import</b> and pick your campaign sheet, orders export and spend files.</div>'}
+
+function vHome(){
+ if(!S.list.length)return empty();
+ var B=buyers(),T=totals(B),bl=T.spend&&T.att?T.spend/T.att:null,nd=Math.max(S.dates.length,1);
+ var h='<div class="grid2"><div class="kpi"><small>Total orders</small><b>'+f(S.tot)+'</b><span>'+nd+' day'+(nd>1?'s':'')+'</span></div><div class="kpi"><small>Blended CPA</small><b>'+(bl?f(bl,1):'—')+'</b><span>'+(T.spend?f(T.spend)+' spent':'add spend')+'</span></div><div class="kpi"><small>From campaigns</small><b>'+f(T.att)+'</b><span>'+f(T.att/(S.tot||1)*100,1)+'% of orders</span></div><div class="kpi"><small>No campaign</small><b>'+f(S.nocamp)+'</b><span>organic / direct</span></div></div>';
+ h+='<h2>Media buyers</h2>';
+ B.forEach(function(b,i){var cl=b.cpa&&bl?(b.cpa<=bl?'var(--g)':'var(--r)'):'var(--t3)',mx=b.orders||1;
+  h+='<div class="card"><div class="row"><div class="av">'+esc(b.name)[0]+'</div><div class="grow"><div class="name">'+esc(b.name)+'</div><div class="sub">'+b.camps+' campaigns · '+f(b.orders)+' orders · '+f(b.orders/nd,1)+'/day</div></div><div class="big" style="color:'+cl+'">'+(b.cpa?f(b.cpa,1):'—')+'<small>CPA</small></div></div>'
+  +'<div class="bar">'+PL.map(function(p){return '<i style="width:'+(b.orders?b.po[p]/b.orders*100:0)+'%;background:'+PC[p]+'"></i>'}).join('')+'</div>'
+  +'<div class="split">'+PL.map(function(p){return '<span>'+p+' <b>'+f(b.po[p])+'</b>'+(b.ps[p]&&b.po[p]?' · '+f(b.ps[p]/b.po[p],1):'')+'</span>'}).join('')+'</div>'
+  +'<div class="split" style="margin-top:6px"><span>Spend <b>'+(b.spend?f(b.spend):'—')+'</b></span><span>Share <b>'+f(b.orders/(T.att||1)*100,1)+'%</b></span></div></div>'});
+ h+='<h2>Platforms</h2><div class="card">'+PL.map(function(p){var o=B.reduce(function(s,b){return s+b.po[p]},0),cp=T.t[p]&&o?T.t[p]/o:null;return '<div class="split" style="padding:6px 0"><span><span class="chip c'+p[0]+'">'+p+'</span> '+f(o)+' orders</span><span>Spend <b>'+f(T.t[p])+'</b> · CPA <b>'+(cp?f(cp,1):'—')+'</b></span></div>'}).join('')+'</div>';
+ return h}
+
+function vCamp(){
+ if(!S.list.length)return empty();
+ var h='<div class="seg">'+['All'].concat(PL).map(function(t){return '<button data-filt="'+t+'" class="'+(t===filt?'on':'')+'">'+t+'</button>'}).join('')+'</div>';
+ var L=S.list.filter(function(c){return filt==='All'||c.plat===filt}).sort(function(a,b){return b.orders-a.orders});
+ L.forEach(function(c){var s=cspend(c),cp=s&&c.orders?s/c.orders:null,v=verdict(c,cp),pm=c.orders?c.on/c.orders*100:null;
+  h+='<div class="card"><div class="row"><div class="grow"><div class="name">'+esc(c.name)+'<span class="chip c'+c.plat[0]+'">'+c.plat+'</span></div><div class="sub">'+esc(c.offer)+'</div><div class="sub" style="font-family:ui-monospace,monospace">ID '+esc(c.id)+' · '+esc(c.buyer)+'</div></div><div class="big">'+f(c.orders)+'<small>orders</small></div></div>'
+  +'<div class="split" style="margin-top:12px"><span>CPA <b>'+(cp?f(cp,1):'—')+'</b> '+(v?'<span class="chip '+v.c+'">'+v.t+'</span>':'')+'</span><span>Offer match <b>'+(pm==null?'—':f(pm)+'%')+'</b></span></div></div>'});
+ var U=Object.keys(S.unm).sort(function(a,b){return S.unm[b].n-S.unm[a].n});
+ if(U.length){h+='<h2>Not in campaign sheet</h2>';U.forEach(function(k){var q=S.unm[k];h+='<div class="card unm"><div class="row"><div class="grow"><div class="name">'+esc(q.raw)+'</div><div class="sub" style="font-family:ui-monospace,monospace">ID '+esc(q.raw)+'</div></div><div class="big">'+q.n+'<small>orders</small></div></div></div>'})}
+ return h}
+
+function vOff(){
+ var h='<h2>Break-even per order</h2>';
+ OFS.forEach(function(o){var c=ofc(o);
+  h+='<div class="card"><div class="name" style="margin-bottom:10px">'+esc(o.n)+'</div>'
+  +'<div class="fields">'
+  +'<div><label>Sell price</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="sell" value="'+o.sell+'"></div>'
+  +'<div><label>Product cost</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="cost" value="'+o.cost+'"></div>'
+  +'<div><label>Confirm %</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="conf" value="'+Math.round(o.conf*1000)/10+'"></div>'
+  +'<div><label>Return %</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="rr" value="'+Math.round(o.rr*1000)/10+'"></div>'
+  +'<div><label>Shipping</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="ship" value="'+o.ship+'"></div>'
+  +'<div><label>Packaging</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="pack" value="'+o.pack+'"></div>'
+  +'<div style="grid-column:1/3"><label>Return shipping</label><input class="in" inputmode="decimal" data-act="off" data-k="'+o.k+'" data-f="rship" value="'+o.rship+'"></div>'
+  +'</div><div class="res"><div><small>Break-even per confirmed</small><b class="'+(c.be>0?'be':'bn')+'">'+f(c.be,1)+'</b></div><div><small>Break-even per order</small><b class="'+(c.raw>0?'be':'bn')+'">'+f(c.raw,1)+'</b></div><div><small>Profit / delivered</small><b>'+f(c.del)+'</b></div><div><small>Loss / return</small><b>'+f(c.loss)+'</b></div></div></div>'});
+ h+='<div class="sub" style="padding:4px 4px 0;color:var(--t3)">Compare a campaign\'s CPA with "per order". Scale below 70%, Keep up to 100%, Kill above.</div>';
+ return h}
+
+function vSpend(){
+ if(!S.list.length&&!Object.keys(S.bs).length)return empty();
+ var B=buyers(),names=B.map(function(b){return b.name}).filter(function(n){return n!=='Unassigned'});
+ if(!sb||names.indexOf(sb)<0)sb=names[0]||'';
+ var fileSp={};B.forEach(function(b){fileSp[b.name]=b.ps});
+ var h='<div class="seg">'+names.map(function(n){return '<button data-buyer="'+esc(n)+'" class="'+(n===sb?'on':'')+'">'+esc(n)+'</button>'}).join('')+'</div>';
+ if(!sb){return h+empty()}
+ var ov=S.bs[sb]||{},fs=fileSp[sb]||{Meta:0,TikTok:0,Google:0,Snapchat:0};
+ h+='<div class="card"><div class="name" style="margin-bottom:12px">'+esc(sb)+' · total spend</div><div class="fields">'
+  +PL.map(function(p){return '<div><label>'+p+'</label><input class="in" inputmode="decimal" placeholder="'+(fs[p]?f(fs[p]):'0')+'" data-act="spend" data-b="'+esc(sb)+'" data-p="'+p+'" value="'+(ov[p]!==undefined?ov[p]:'')+'"></div>'}).join('')
+  +'</div><div class="sub" style="margin-top:10px">Type the total you spent on Meta, TikTok, Google and Snapchat. Leave empty to use the spend from imported files. Totals add up automatically.</div></div>';
+ var tot=totals(B);
+ h+='<h2>Team total</h2><div class="card"><div class="big" style="text-align:left;font-size:30px">'+f(tot.spend)+'<small>all media buyers</small></div><div class="split" style="margin-top:12px">'+PL.map(function(p){return '<span>'+p+' <b>'+f(tot.t[p])+'</b></span>'}).join('')+'</div></div>';
+ h+='<h2>Per buyer</h2>';
+ B.filter(function(b){return b.name!=='Unassigned'}).forEach(function(b){h+='<div class="card"><div class="row"><div class="grow"><div class="name">'+esc(b.name)+'</div><div class="sub">'+PL.map(function(p){return p+' '+f(b.ps[p])}).join(' · ')+'</div></div><div class="big">'+(b.spend?f(b.spend):'—')+'<small>spend</small></div></div></div>'});
+ return h}
+
+var VIEWS={home:vHome,camp:vCamp,off:vOff,spend:vSpend};
+var TITLES={home:'Attribution',camp:'Campaigns',off:'Offers',spend:'Spend'};
+function go(v){cur=v;$('ttl').textContent=TITLES[v];
+ [].forEach.call($('nav').querySelectorAll('button'),function(b){b.classList.toggle('on',b.dataset.v===v)});
+ $('main').innerHTML=VIEWS[v]();$('main').scrollTop=0}
+
+$('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.dataset.v)go(b.dataset.v)});
+$('main').addEventListener('click',function(e){var t=e.target.closest('[data-filt],[data-buyer]');if(!t)return;if(t.dataset.filt){filt=t.dataset.filt;go('camp')}if(t.dataset.buyer){sb=t.dataset.buyer;go('spend')}});
+$('main').addEventListener('change',function(e){var t=e.target;if(!t.dataset||!t.dataset.act)return;
+ if(t.dataset.act==='off'){var o=OFS.filter(function(x){return x.k===t.dataset.k})[0],v=+t.value||0;o[t.dataset.f]=(t.dataset.f==='rr'||t.dataset.f==='conf')?v/100:v;var st={};OFS.forEach(function(x){st[x.k]={sell:x.sell,cost:x.cost,rr:x.rr,conf:x.conf,ship:x.ship,pack:x.pack,rship:x.rship}});S.off=st;try{localStorage.setItem('mb_off',JSON.stringify(st))}catch(x){}toast('Saved');go('off')}
+ if(t.dataset.act==='spend'){var b=t.dataset.b;S.bs[b]=S.bs[b]||{};if(t.value===''){delete S.bs[b][t.dataset.p]}else{S.bs[b][t.dataset.p]=t.value}try{localStorage.setItem('mb_bs',JSON.stringify(S.bs))}catch(x){}toast('Saved');go('spend')}
+});
+
+$('imp').onclick=function(){$('fin').click()};
+$('fin').onchange=function(){var fl=[].slice.call(this.files),left=fl.length;if(!left)return;var self=this;
+ fl.forEach(function(file){read(file,function(rows){classify(rows);if(--left===0){build();toast('Loaded '+fl.length+' file'+(fl.length>1?'s':''));go(cur)}})});
+ self.value=''};
+
+go('home');
+</script>
+</body>
+</html>
